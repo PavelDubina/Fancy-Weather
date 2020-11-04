@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
     <title>Fancy-Weather</title>
 </head>
+
 <body>
     <div class="app--container">
         <div class="control--block">
@@ -13,12 +17,18 @@
                 <button class="btn refresh--image--btn">
                     <img src="./img/vector.png" alt="refresh" class="refresh--img">
                 </button>
-                <select class="droplist--block">
-                    <option style="background: grey;">RU</option>
-                    <option style="background: grey;">EN</option>
-                </select>
-                <button class="btn f--temperature">°F</button>
-                <button class="btn c--temperature">°C</button>
+                <div class="lang--button--wrapper">
+                    <button class="btn btn--lang">
+                        ru
+                    </button>
+                    <button class="btn btn--lang">
+                        en
+                    </button>
+                </div>
+                <div class="temp--button--wrapper">
+                    <button class="btn f--temperature">°F</button>
+                    <button class="btn c--temperature">°C</button>
+                </div>
             </div>
             <div class="wrapper wrapper--search">
                 <input type="text" class="input--block" placeholder="Search">
@@ -36,16 +46,70 @@
                 Mon 28 October 17:23:01
             </div>
             <div class="weather--block">
-
+                <div class="weather--temp">
+                    +10°
+                </div>
+                <div class="weather--temp--img">
+                    <img src="./img/weather.png" alt="weather">
+                </div>
+                <div class="weather--discription">
+                    <p class="condition">overcast</p>
+                    <p class="feels">feels like: 7°</p>
+                    <p class="wind">wind: 2 m/s</p>
+                    <p class="humidity">humidity: 83%</p>
+                </div>
             </div>
             <div class="future--weather--block">
-
+                <div class="weather--day">
+                    <div class="future--day--name">
+                        tuesday
+                    </div>
+                    <div class="future--temp">
+                        7°
+                    </div>
+                    <div class="future--img">
+                        <img src="./img/futureWeather.png" alt="future-weather">
+                    </div>
+                </div>
+                <div class="weather--day">
+                    <div class="future--day--name">
+                        wendnesday
+                    </div>
+                    <div class="future--temp">
+                        9°
+                    </div>
+                    <div class="future--img">
+                        <img src="./img/futureWeather.png" alt="future-weather">
+                    </div>
+                </div>
+                <div class="weather--day">
+                    <div class="future--day--name">
+                        thursday
+                    </div>
+                    <div class="future--temp">
+                        3°
+                    </div>
+                    <div class="future--img">
+                        <img src="./img/futureWeather.png" alt="future-weather">
+                    </div>
+                </div>
             </div>
         </div>
         <div class="wrapper--map">
-
+            <div class="map" id="map">
+            </div>
+            <p class="coordinates">latitude: 53°54'</p>
+            <p class="coordinates">longitude: 27°38'</p>
         </div>
     </div>
-    <script src=""></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicGF2ZWxla25hbWUiLCJhIjoiY2toM2llY2w3MGV1MTJ5bHNlcjhzMTFuaCJ9.Gvc2M_yIZPhIOWwgG5t4BA';
+        const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11'
+        });
+        </script>
+    <script src="./index.js"></script>
 </body>
+
 </html>
