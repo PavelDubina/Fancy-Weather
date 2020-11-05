@@ -39,9 +39,7 @@
             </div>
         </div>
         <div class="wrapper--weather">
-            <div class="location--text">
-                Brest, Belarus
-            </div>
+            <div class="location--text"></div>
             <div class="date--text">
                 Mon 28 October 17:23:01
             </div>
@@ -98,17 +96,12 @@
         <div class="wrapper--map">
             <div class="map" id="map">
             </div>
-            <p class="coordinates">latitude: 53°54'</p>
-            <p class="coordinates">longitude: 27°38'</p>
+            <p class="coordinates latitude"></p>
+            <p class="coordinates longitude"></p>
         </div>
     </div>
-    <script>
-        mapboxgl.accessToken = 'pk.eyJ1IjoicGF2ZWxla25hbWUiLCJhIjoiY2toM2llY2w3MGV1MTJ5bHNlcjhzMTFuaCJ9.Gvc2M_yIZPhIOWwgG5t4BA';
-        const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11'
-        });
-        </script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=20054a94-ac2a-468d-87b5-27c40b85b89e
+    " type="text/javascript"></script>
     <script src="./index.js"></script>
 </body>
 
