@@ -39,7 +39,9 @@ const searchBtn = document.querySelector('.search--btn')
 const cityAndCountry = document.querySelector('.location--text')
 const latitude = document.querySelector('.latitude')
 const longitude = document.querySelector('.longitude')
+const datePlace = document.querySelector('.date--text')
 let searchPlaceInFocus = false;
+
 
 
 /////////////Find my coordinates//////////////////////////
@@ -49,6 +51,7 @@ const findGeolocation = async () => {
   let coordinates = data.loc.split(',').map((i) => {
     return +i
   })
+  console.log(coordinates = data.loc)
   return coordinates
 }
 
@@ -64,22 +67,24 @@ const createMap = (container, coordinats, zoom) => {
 }
 
 const installMyGeolocation = (myMap) => {
-  findGeolocation().then((location) => {
-  changeMap(location, myMap)
+  findGeolocation().then((locationValue) => {
+  changeMap(locationValue, myMap)
   })
 }
 
-const findLocation = (myMap) => {
+const findNewLocation = (myMap) => {
   const locationValue = searchPlace.value;
   if(locationValue === '') return
   changeMap(locationValue, myMap);
   searchPlace.value = ''
 }
 
+let id;
 const changeMap = (locationValue, myMap) => {
-  return ymaps.geocode(locationValue)
+     ymaps.geocode(locationValue)
     .then((result) => { 
       try{
+        clearTimeout(id)
         const location = result.geoObjects.get(0)
         const country = location.getCountry()
         const city = location.getLocalities().length > 1 ? location.getLocalities()[1] : location.getLocalities()[0]
@@ -89,16 +94,51 @@ const changeMap = (locationValue, myMap) => {
         longitude.innerHTML = `Долгота: ${String(longitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
         cityAndCountry.innerHTML = `${city?city:''} ${country}`
         myMap.panTo(coordinates)
+        getTimeZone(...coordinates).then((timeZone) => {id = setInterval(getTime.bind(null, timeZone), 1000)})
       } catch(error){
         searchPlace.value = 'Ошибка запроса. Повторите пожалуйста.'
       } 
     })
 }
 
+
+const getTime = (timeZone) =>{
+  let options = {
+    weekday : 'short',
+    day: 'numeric',
+    month: 'long',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZone : timeZone
+  }
+  const date = new Date()
+  datePlace.innerHTML = date.toLocaleString('ru', options).replace(/,/g, '')
+}
+
+const getTimeZone = async (latitude, longitude) => {
+  const result = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=c127895a61b649119859150903a3c8db&pretty=1`)
+  const data = await result.json();
+  const timeZone = data?.results[0]?.annotations?.timezone?.name;
+  return timeZone
+}
+
+
+
+const getWeather = async () => {
+  const result = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=3750d126b7904952b98142542200611&q=Brest&days=4`)
+  const data = await result.json();
+  console.log(data)
+}
+
+ getWeather()
+
+
+let myMap;
 const init = () => {
-  const myMap = createMap('map', [45, 20], 12)
+  myMap = createMap('map', [45, 20], 12)
   installMyGeolocation(myMap);
-  searchBtn.addEventListener('click', findLocation.bind(null, myMap))
+  searchBtn.addEventListener('click', findNewLocation.bind(null, myMap))
 }
 
 searchPlace.addEventListener('focus', () => {
@@ -116,11 +156,6 @@ window.addEventListener('keydown', (e) => {
 })
 
 ymaps.ready(init);
-
-
-
-
-
 
 
 
