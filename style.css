@@ -218,6 +218,7 @@ button{
     align-self: center;
     font-weight: bold;
     font-size: 1rem;
+    text-transform: uppercase;
 }
 .future--temp{
     width: 40%;
