@@ -36,6 +36,7 @@ const datePlace = document.querySelector('.date--text')
 const currentWeatherTemp = document.querySelector('.weather--temp')
 const descriptionWeatherText = document.querySelector('.description')
 const feelsLikeTemp = document.querySelector('.feels--temp')
+const feelsLikeText = document.querySelector('.feels--text')
 const windText = document.querySelector('.wind')
 const humidityText = document.querySelector('.humidity')
 const currentWeatherImg = document.querySelector('.weather--temp--img img')
@@ -291,7 +292,7 @@ const updateCurrentWeather = async (coords) => {
   const humidity = language === 'ru' ? 'влажность' : 'humidity'
   const wind = language === 'ru' ? 'ветер' : 'wind'
   const units = language === 'ru' ? 'м/с' : 'm/s'
-  const feels_like = language === 'ru' ? 'ощущается как' : 'feels like'
+  const feelsLike = language === 'ru' ? 'ощущается как: ' : 'feels like: '
   const weather = await getCurrentWeather(coords)
   if(localStorage.getItem('userTempScale') === 'F'){
     weather.temp = Math.round(getForengeitScale(weather.temp))
@@ -301,7 +302,8 @@ const updateCurrentWeather = async (coords) => {
   windText.innerHTML = `${wind}: ${weather.wind} ${units}`
   descriptionWeatherText.innerHTML = weather.description
   currentWeatherTemp.innerHTML = `${weather.temp}°`
-  feelsLikeTemp.innerHTML = `${feels_like}: ${weather.feelsLike}°`;
+  feelsLikeText.innerHTML = `${feelsLike}`
+  feelsLikeTemp.innerHTML = `${weather.feelsLike}°`;
   currentWeatherImg.src = `http://openweathermap.org/img/wn/${weather.icon}@4x.png`
 }
 
