@@ -62,6 +62,20 @@ button{
     text-transform: uppercase;
 }
 
+.language--select{
+    margin: 20px;
+    font-size: 0.8rem;
+    width: 88px;
+    height: 44px;
+    text-align: center;
+    outline: none;
+    cursor: pointer;
+    background-color: rgba(174,181,185,0.5);
+    text-transform: uppercase;
+}
+.active--temp {
+    background: red;
+}
 .btn:hover{
     background-color: rgba(174, 181, 185, 0.801); 
 }
@@ -178,7 +192,7 @@ button{
 
 .weather--temp{
     grid-area: temp;
-    font-size: 9rem;
+    font-size: 10rem;
     text-align: center;
     align-self: center;
 }
@@ -273,7 +287,7 @@ iframe{
     html {
         font-size: 14px;
     }
-    .btn{
+    .btn, .language--select{
         font-size: 1rem;
     }
 }
@@ -315,7 +329,7 @@ iframe{
     html {
         font-size: 10px;
     }
-    .btn{
+    .btn, .language--select{
         font-size: 1.2rem;
     }
 }
@@ -326,6 +340,10 @@ iframe{
     }
     .btn{
         width: 37px;
+        height: 37px;
+    }
+    .language--select{
+        width: 74px;
         height: 37px;
     }
 }

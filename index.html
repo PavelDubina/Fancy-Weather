@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
     <title>Fancy-Weather</title>
 </head>
 
@@ -17,14 +15,10 @@
                 <button class="btn refresh--image--btn">
                     <img src="./img/vector.png" alt="refresh" class="refresh--img">
                 </button>
-                <div class="lang--button--wrapper">
-                    <button class="btn btn--lang">
-                        ru
-                    </button>
-                    <button class="btn btn--lang">
-                        en
-                    </button>
-                </div>
+                <select class="language--select" id="language">
+                    <option value="ru">ru</option>
+                    <option selected value="en">en</option>
+                </select>
                 <div class="temp--button--wrapper">
                     <button class="btn f--temperature">°F</button>
                     <button class="btn c--temperature">°C</button>
@@ -48,41 +42,29 @@
                 </div>
                 <div class="weather--discription">
                     <p class="description"></p>
-                    <p class="feels"></p>
+                    <p class="feels"><span class="feels--temp"></span></p>
                     <p class="wind"></p>
                     <p class="humidity"></p>
                 </div>
             </div>
             <div class="future--weather--block">
                 <div class="weather--day">
-                    <div class="future--day--name">
-                        tuesday
-                    </div>
-                    <div class="future--temp">
-                        7°
-                    </div>
+                    <div class="future--day--name"></div>
+                    <div class="future--temp"></div>
                     <div class="future--img">
                         <img src="./img/futureWeather.png" alt="future-weather">
                     </div>
                 </div>
                 <div class="weather--day">
-                    <div class="future--day--name">
-                        wendnesday
-                    </div>
-                    <div class="future--temp">
-                        9°
-                    </div>
+                    <div class="future--day--name"></div>
+                    <div class="future--temp"></div>
                     <div class="future--img">
                         <img src="./img/futureWeather.png" alt="future-weather">
                     </div>
                 </div>
                 <div class="weather--day">
-                    <div class="future--day--name">
-                        thursday
-                    </div>
-                    <div class="future--temp">
-                        3°
-                    </div>
+                    <div class="future--day--name"></div>
+                    <div class="future--temp"></div>
                     <div class="future--img">
                         <img src="./img/futureWeather.png" alt="future-weather">
                     </div>
@@ -96,8 +78,7 @@
             <p class="coordinates longitude"></p>
         </div>
     </div>
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=20054a94-ac2a-468d-87b5-27c40b85b89e&lang=ru_RU"
-    " type="text/javascript"></script>
+    
     <script src="./index.js"></script>
 </body>
 

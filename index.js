@@ -35,17 +35,104 @@ const longitude = document.querySelector('.longitude')
 const datePlace = document.querySelector('.date--text')
 const currentWeatherTemp = document.querySelector('.weather--temp')
 const descriptionWeatherText = document.querySelector('.description')
-const feelsLikeText = document.querySelector('.feels')
+const feelsLikeTemp = document.querySelector('.feels--temp')
 const windText = document.querySelector('.wind')
 const humidityText = document.querySelector('.humidity')
 const currentWeatherImg = document.querySelector('.weather--temp--img img')
 const forecastDayText = document.querySelectorAll('.future--day--name')
 const forecastTempText = document.querySelectorAll('.future--temp')
 const forecastImg = document.querySelectorAll('.future--img')
+const cBtn = document.querySelector('.c--temperature')
+const fBtn = document.querySelector('.f--temperature')
+const getForengeitScale = (celsiusTemp) => (celsiusTemp * 9/5) + 32
+const getCelsiusScale = (forengeitTemp) => (forengeitTemp - 32) * 5/9
 let searchPlaceInFocus = false;
-let interval;
+let interval; 
+let cBtnActive = true
+let fBtnActive = true
 
-console.log(currentWeatherImg.src)
+
+let language;
+let myMap;
+const init = (ymaps) => {
+  myMap = createMap('map', [45, 10], 12, ymaps)
+  updateAppData().then(coordinates => {
+    myMap.panTo(coordinates)
+    updateTime(coordinates)
+    updateCurrentWeather(coordinates)
+    updateForecastWeather(coordinates)
+  })
+  searchBtn.addEventListener('click', findNewLocation.bind(null, myMap))
+  defaultOptions()
+}
+
+window.onload = () => {
+    // Получим ссылки на элементы с тегом 'head' и id 'language'.
+    const head = document.getElementsByTagName('head')[0];
+    const select = document.getElementById('language');
+    select.createMap = function () {
+        // Получим значение выбранного языка.
+        language = this.value;
+        // Если карта уже была создана, то удалим её.
+        if (myMap) myMap.destroy();
+        // Создадим элемент 'script'.
+        const script = document.createElement('script');
+        // Запишем ссылку на JS API Яндекс.Карт с выбранным языком в атрибут 'src'.
+        script.src = 'https://api-maps.yandex.ru/2.1/?apikey=20054a94-ac2a-468d-87b5-27c40b85b89e&onload=init_' + language + '&lang=' + language +
+            '_RU&ns=ymaps_' + language;
+        // Добавим элемент 'script' на страницу.
+        head.appendChild(script);
+        // Использование пространства имен позволяет избежать пересечения названий функций
+        // и прочих программных компонентов.
+        window['init_' + language] = () => {
+            init(window['ymaps_' + language]);
+        }
+    };
+    // Назначим обработчик для события выбора языка из списка.
+    select.addEventListener("change", select.createMap);
+    // Создадим карту и зададим для нее язык, который был выбран по умолчанию.
+    select.createMap();
+};
+
+////////Единицы измерения по умолчанию//////////////////
+const defaultOptions = () => {
+  if(localStorage.getItem('userTempScale') === 'F'){
+    fBtn.classList.add('active--temp')
+    fBtnActive = false
+  } else {
+    cBtn.classList.add('active--temp')
+    cBtnActive = false
+  }
+}
+
+
+fBtn.addEventListener('click', ()=> {
+  if(!fBtnActive) return
+  fBtn.classList.add('active--temp')
+  cBtn.classList.remove('active--temp')
+  localStorage.setItem('userTempScale', 'F')
+  currentWeatherTemp.textContent = `${Math.round(getForengeitScale(parseInt(currentWeatherTemp.textContent)))}°`
+  for(let tempText of forecastTempText){
+    tempText.textContent = `${Math.round(getForengeitScale(parseInt(tempText.textContent)))}°`
+  }
+  feelsLikeTemp.textContent = `${Math.round(getForengeitScale(parseInt(feelsLikeTemp.textContent)))}°`
+  fBtnActive = false
+  cBtnActive = true
+})
+
+cBtn.addEventListener('click', ()=>{
+  if(!cBtnActive) return
+  cBtn.classList.add('active--temp')
+  fBtn.classList.remove('active--temp')
+  localStorage.setItem('userTempScale', 'C')
+  currentWeatherTemp.textContent = `${Math.round(getCelsiusScale(parseInt(currentWeatherTemp.textContent)))}°`
+  for(let tempText of forecastTempText){
+    tempText.textContent = `${Math.round(getCelsiusScale(parseInt(tempText.textContent)))}°`
+  }
+  feelsLikeTemp.textContent = `${Math.round(getCelsiusScale(parseInt(feelsLikeTemp.textContent)))}°`
+  cBtnActive = false
+  fBtnActive = true
+})
 
 /////////////Find my coordinates//////////////////////////
 const findGeolocation = async () => {
@@ -54,11 +141,10 @@ const findGeolocation = async () => {
   let coordinates = data.loc.split(',').map((i) => {
     return +i
   })
-  console.log(coordinates)
    return coordinates
 }
-/////////////////////Создаём карту/////////////////////////
-const createMap = (container, coordinats, zoom) => {
+///////////////////Создаём карту/////////////////////////
+const createMap = (container, coordinats, zoom, ymaps) => {
   return new ymaps.Map(container, {
     center: coordinats, // Your location
     zoom: zoom,
@@ -82,25 +168,34 @@ const findNewLocation = (map) => {
 
 ///////////////////Получение объекта данных из карты///////////////
 const getYandexMethods = (locationValue) => {
-  return ymaps.geocode(locationValue)
+    return window[`ymaps_${language}`].geocode(locationValue)
 }
 ///////////////////Получение данных из карты//////////////////////////
 const getData = async (coords) => {
-  const locationValue = coords ? coords : await findGeolocation()
-  const yandexData = await getYandexMethods(locationValue)
-  const geoObject = yandexData.geoObjects.get(0)
-  const country = geoObject.getCountry()
-  const city = geoObject.getLocalities().length > 1 ? geoObject.getLocalities()[1] : geoObject.getLocalities()[0]
-  const coordinates = typeof locationValue === 'string' ? geoObject.geometry.getCoordinates() : locationValue
-  return {country, city, coordinates}
+  try{
+    const locationValue = coords ? coords : await findGeolocation()
+    const yandexData = await getYandexMethods(locationValue)
+    const geoObject = yandexData.geoObjects.get(0)
+    const country = geoObject.getCountry()
+    const city = geoObject.getLocalities().length > 1 ? geoObject.getLocalities()[1] : geoObject.getLocalities()[0]
+    const coordinates = typeof locationValue === 'string' ? geoObject.geometry.getCoordinates() : locationValue
+    return {country, city, coordinates}
+  } catch(error){
+    console.error(error)
+    searchPlace.value = ' The request failed'
+    return
+  }
+  
 }
 //////////////// Обновление данных////////////////////
 const updateAppData = async (coords) => {
+  let latitudeText = language === 'ru' ? 'Широта' : 'latitude'
+  let longitudeText = language === 'ru' ? 'Долгота' : 'longitude'
   const placeData = await getData(coords);
     cityAndCountry.innerHTML = `${placeData.city?placeData.city:''} ${placeData.country}`
     let [latitudeValue, longitudeValue] = placeData.coordinates;
-        latitude.innerHTML = `Широта: ${String(latitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
-        longitude.innerHTML = `Долгота: ${String(longitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
+        latitude.innerHTML = `${latitudeText}: ${String(latitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
+        longitude.innerHTML = `${longitudeText}: ${String(longitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
         return placeData.coordinates 
 }
 
@@ -125,7 +220,7 @@ const getTime = (timeZone) =>{
     timeZone : timeZone
   }
   const date = new Date()
-  datePlace.innerHTML = date.toLocaleString('ru', options).replace(/,/g, '')
+  datePlace.innerHTML = date.toLocaleString(`${language}`, options).replace(/,/g, '')
 }
 //////////////////////////////////////////////////////////////
 
@@ -138,7 +233,7 @@ const getTimeZone = async (latitude, longitude) => {
 }
 //////////////////Получаем ответ на запрос о погоде/////////////
 const getWeather = async (latitude, longitude) => {
-  const result = await fetch(`https://api.openweathermap.org/data/2.5/onecall?units=metric&exclude=minutely,hourly,alerts&lang=ru&lat=${latitude}&lon=${longitude}8&appid=7cf40857722b732df763dfd8436e2835`)
+  const result = await fetch(`https://api.openweathermap.org/data/2.5/onecall?units=metric&exclude=minutely,hourly,alerts&lang=${language}&lat=${latitude}&lon=${longitude}8&appid=7cf40857722b732df763dfd8436e2835`)
   const data = await result.json();
   return data
 }
@@ -166,11 +261,14 @@ const updateForecastWeather = async (coords) => {
   const arrayDayDate = [weather.firstDayData.dt * 1000, weather.secondDayData.dt * 1000, weather.thirdDayData.dt * 1000]
   const arrayDayTemp = [weather.firstDayData.temp.day.toFixed(), weather.secondDayData.temp.day.toFixed(), weather.thirdDayData.temp.day.toFixed()]
   forecastTempText.forEach((tempText) => {
+    if(localStorage.getItem('userTempScale') === 'F'){
+      arrayDayTemp[dayTempIndex] = Math.round(getForengeitScale(arrayDayTemp[dayTempIndex]))
+    }
     tempText.innerHTML = `${arrayDayTemp[dayTempIndex]}°`
     dayTempIndex++
   })
     forecastDayText.forEach((dayText) => {
-      dayText.innerHTML = (new Date(arrayDayDate[dayNameIndex])).toLocaleString('ru', {weekday: 'long'})
+      dayText.innerHTML = (new Date(arrayDayDate[dayNameIndex])).toLocaleString(`${language}`, {weekday: 'long'})
       dayNameIndex++
   }) 
 
@@ -190,27 +288,27 @@ const getCurrentWeather = async (coords) => {
 }
 /////////////////Обновляем данные о текущей погоде///////////////
 const updateCurrentWeather = async (coords) => {
+  const humidity = language === 'ru' ? 'влажность' : 'humidity'
+  const wind = language === 'ru' ? 'ветер' : 'wind'
+  const units = language === 'ru' ? 'м/с' : 'm/s'
+  const feels_like = language === 'ru' ? 'ощущается как' : 'feels like'
   const weather = await getCurrentWeather(coords)
-  humidityText.innerHTML = `влажность: ${weather.humidity}%`
-  windText.innerHTML = `ветер: ${weather.wind} м/с`
+  if(localStorage.getItem('userTempScale') === 'F'){
+    weather.temp = Math.round(getForengeitScale(weather.temp))
+    weather.feelsLike = Math.round(getForengeitScale(weather.feelsLike))
+  }
+  humidityText.innerHTML = `${humidity}: ${weather.humidity}%`
+  windText.innerHTML = `${wind}: ${weather.wind} ${units}`
   descriptionWeatherText.innerHTML = weather.description
-  currentWeatherTemp.innerHTML = weather.temp < 0 ? `${weather.temp}°` : weather.temp > 0 ? `+${weather.temp}°` : 0;
-  feelsLikeText.innerHTML = `ощущается как: ${weather.feelsLike}°`;
+  currentWeatherTemp.innerHTML = `${weather.temp}°`
+  feelsLikeTemp.innerHTML = `${feels_like}: ${weather.feelsLike}°`;
   currentWeatherImg.src = `http://openweathermap.org/img/wn/${weather.icon}@4x.png`
 }
 
 ///////////////////
-const init = () => {
-  myMap = createMap('map', [45, 20], 12)
-  updateAppData().then(coordinates => {
-    myMap.panTo(coordinates)
-    updateTime(coordinates)
-    updateCurrentWeather(coordinates)
-    updateForecastWeather(coordinates)
-    getWeatherData(coordinates).then((data)=>{console.log(data.daily); console.log((new Date(1604829600000)).toLocaleString('ru', {weekday: 'long'}))})
-  })
-  searchBtn.addEventListener('click', findNewLocation.bind(null, myMap))
-}
+
+
+
 
 searchPlace.addEventListener('focus', () => {
   searchPlace.value = '';
@@ -226,7 +324,6 @@ window.addEventListener('keydown', (e) => {
   }
 })
 
-ymaps.ready(init);
 
 
 
