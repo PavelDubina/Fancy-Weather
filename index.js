@@ -185,6 +185,7 @@ const updateAppData = async (placeData) => {
 ////////////// Обновляем время///////////////////////
 const updateTime = async (placeData) => {
   clearInterval(interval)
+  console.log(interval)
   const coordinates = placeData.coordinates
   const timeZone = await getTimeZone(...coordinates)
   interval = setInterval(getTime.bind(null, timeZone), 1000)
@@ -315,7 +316,7 @@ const startRecognizer = () => {
       const result = event.results[event.resultIndex]
       console.clear()
       searchPlace.value = result[0].transcript
-      searchBtn.click()
+      findNewLocation(searchPlace.value)
     }
     recognition.start();
 }
