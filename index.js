@@ -65,15 +65,17 @@ const createMap = (container, coordinats, zoom, ymaps) => {
 
 let language;
 let myMap;
-const init = (ymaps) => {
+const init = async (ymaps) => {
   myMap = createMap('map', [1, 0], 12, ymaps)
   myMap.controls.remove('smallMapDefaultSet')
-  updateAppData().then(coordinates => {
+  const locationValue = await findGeolocation()
+  const placeData = await getData(locationValue)
+  updateAppData(placeData).then(coordinates => {
     myMap.panTo(coordinates)
-    updateTime(coordinates)
-    updateCurrentWeather(coordinates)
-    updateForecastWeather(coordinates)
   })
+    updateTime(placeData)
+    updateCurrentWeather(placeData)
+    updateForecastWeather(placeData)
   searchBtn.addEventListener('click', findNewLocation.bind(null, myMap))
   defaultOptions()
 }
@@ -130,31 +132,29 @@ const findGeolocation = async () => {
 }
 
 /////////////////////Ищем новую локацию///////////////////////
-const findNewLocation = () => {
+const findNewLocation = async () => {
   const locationValue = searchPlace.value;
   if (locationValue === '') return
-  updateAppData(locationValue).then(coordinates => {
+  const placeData = await getData(locationValue)
+  if(!placeData) return
+  updateAppData(placeData).then(coordinates => {
     momentCoordinates = coordinates;
     myMap.panTo(coordinates, {
       duration: 2000
     })
   })
-  updateTime(locationValue)
-  searchPlace.value = ''
-  updateCurrentWeather(locationValue)
-  updateForecastWeather(locationValue)
+  updateTime(placeData)
+  updateCurrentWeather(placeData)
+  updateForecastWeather(placeData)
   refreshImgBtn.click()
+  searchPlace.value = ''
 }
 
-///////////////////Получение объекта данных из карты///////////////
-const getYandexMethods = (locationValue) => {
-  return window[`ymaps_${language}`].geocode(locationValue)
-}
 ///////////////////Получение данных из карты//////////////////////////
 const getData = async (coords) => {
   try {
     const locationValue = coords ? coords : await findGeolocation()
-    const yandexData = await getYandexMethods(locationValue)
+    const yandexData = await window[`ymaps_${language}`].geocode(locationValue)
     const geoObject = yandexData.geoObjects.get(0)
     const country = geoObject.getCountry()
     const city = geoObject.getLocalities().length > 1 ? geoObject.getLocalities()[1] : geoObject.getLocalities()[0]
@@ -165,18 +165,16 @@ const getData = async (coords) => {
       coordinates
     }
   } catch (error) {
-    console.error(error)
     searchPlace.value = language === 'en' ? 'The request failed. Repeat please' : 'Ошибка запроса. Повторите пожалуйста'
     searchPlace.classList.add('incorrect')
-    return
+    return null
   }
 
 }
 //////////////// Обновление данных////////////////////
-const updateAppData = async (coords) => {
+const updateAppData = async (placeData) => {
   let latitudeText = language === 'ru' ? 'Широта' : 'latitude'
   let longitudeText = language === 'ru' ? 'Долгота' : 'longitude'
-  const placeData = await getData(coords);
   cityAndCountry.innerHTML = `${placeData.city?placeData.city:''} ${placeData.country}`
   let [latitudeValue, longitudeValue] = placeData.coordinates;
   latitude.innerHTML = `${latitudeText}: ${String(latitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
@@ -185,9 +183,8 @@ const updateAppData = async (coords) => {
 }
 
 ////////////// Обновляем время///////////////////////
-const updateTime = async (coords) => {
+const updateTime = async (placeData) => {
   clearInterval(interval)
-  const placeData = await getData(coords)
   const coordinates = placeData.coordinates
   const timeZone = await getTimeZone(...coordinates)
   interval = setInterval(getTime.bind(null, timeZone), 1000)
@@ -222,16 +219,9 @@ const getWeather = async (latitude, longitude) => {
   const data = await result.json();
   return data
 }
-/////////////////Получаем объект погоды///////////////////
-const getWeatherData = async (coords) => {
-  const placeData = await getData(coords);
-  const coordinates = placeData.coordinates;
-  const weatherDataObject = getWeather(...coordinates)
-  return weatherDataObject
-}
 
 const getForecastWeather = async (coords) => {
-  const weatherDataObject = await getWeatherData(coords)
+  const weatherDataObject = await getWeather(...coords)
   const forecastWeatherData = weatherDataObject.daily;
   const firstDayData = forecastWeatherData[1];
   const secondDayData = forecastWeatherData[2];
@@ -243,11 +233,12 @@ const getForecastWeather = async (coords) => {
   }
 }
 
-const updateForecastWeather = async (coords) => {
+const updateForecastWeather = async (placeData) => {
   let dayNameIndex = 0;
   let dayTempIndex = 0;
   let dayIconIndex = 0;
-  const weather = await getForecastWeather(coords)
+  const coordinates = placeData.coordinates;
+  const weather = await getForecastWeather(coordinates)
   const arrayDayDate = [weather.firstDayData.dt * 1000, weather.secondDayData.dt * 1000, weather.thirdDayData.dt * 1000]
   const arrayDayTemp = [weather.firstDayData.temp.day.toFixed(), weather.secondDayData.temp.day.toFixed(), weather.thirdDayData.temp.day.toFixed()]
   const arrayDayIcon = [weather.firstDayData.weather[0].icon, weather.secondDayData.weather[0].icon, weather.thirdDayData.weather[0].icon]
@@ -273,7 +264,7 @@ const updateForecastWeather = async (coords) => {
 
 ///////////////Получаем и обрабатываем данные о текущей погоде//////////////////////
 const getCurrentWeather = async (coords) => {
-  const weatherDataObject = await getWeatherData(coords)
+  const weatherDataObject = await getWeather(...coords)
   const currentWeatherData = weatherDataObject.current
   const description = currentWeatherData.weather[0].description
   const temp = currentWeatherData.temp.toFixed(0)
@@ -291,12 +282,13 @@ const getCurrentWeather = async (coords) => {
   }
 }
 /////////////////Обновляем данные о текущей погоде///////////////
-const updateCurrentWeather = async (coords) => {
+const updateCurrentWeather = async (placeData) => {
+  const coordinates = placeData.coordinates;
   const humidity = language === 'ru' ? 'влажность' : 'humidity'
   const wind = language === 'ru' ? 'ветер' : 'wind'
   const units = language === 'ru' ? 'м/с' : 'm/s'
   const feelsLike = language === 'ru' ? 'ощущается как: ' : 'feels like: '
-  const weather = await getCurrentWeather(coords)
+  const weather = await getCurrentWeather(coordinates)
   if (localStorage.getItem('userTempScale') === 'F') {
     weather.temp = Math.round(getForengeitScale(weather.temp))
     weather.feelsLike = Math.round(getForengeitScale(weather.feelsLike))
