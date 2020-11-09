@@ -9,7 +9,6 @@ const getBackgroundImage = async () => {
     const data = await result.json();
     return data?.urls?.regular;
   } catch (e) {
-    console.error(e)
     return './img/background.jpg'
   }
 }
