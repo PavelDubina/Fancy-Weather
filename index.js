@@ -66,17 +66,15 @@ const createMap = (container, coordinats, zoom, ymaps) => {
 let language;
 let myMap;
 const init = async (ymaps) => {
-  myMap = createMap('map', [1, 0], 12, ymaps)
-  myMap.controls.remove('smallMapDefaultSet')
   const locationValue = await findGeolocation()
   const placeData = await getData(locationValue)
-  updateAppData(placeData).then(coordinates => {
-    myMap.panTo(coordinates)
-  })
-    updateTime(placeData)
-    updateCurrentWeather(placeData)
-    updateForecastWeather(placeData)
-  searchBtn.addEventListener('click', findNewLocation.bind(null, myMap))
+  const coordinates = await updateAppData(placeData)
+  myMap = createMap('map', locationValue, 12, ymaps)
+  myMap.controls.remove('smallMapDefaultSet')
+  myMap.panTo(coordinates)
+  updateTime(placeData)
+  updateCurrentWeather(placeData)
+  updateForecastWeather(placeData)
   defaultOptions()
 }
 
@@ -134,15 +132,11 @@ const findGeolocation = async () => {
 /////////////////////Ищем новую локацию///////////////////////
 const findNewLocation = async () => {
   const locationValue = searchPlace.value;
-  if (locationValue === '') return
   const placeData = await getData(locationValue)
-  if(!placeData) return
-  updateAppData(placeData).then(coordinates => {
-    momentCoordinates = coordinates;
-    myMap.panTo(coordinates, {
-      duration: 2000
-    })
-  })
+  if (locationValue === '' || !placeData) return
+  const coordinates = await updateAppData(placeData)
+  momentCoordinates = coordinates;
+  myMap.panTo(coordinates, {duration: 2000})
   updateTime(placeData)
   updateCurrentWeather(placeData)
   updateForecastWeather(placeData)
@@ -185,7 +179,6 @@ const updateAppData = async (placeData) => {
 ////////////// Обновляем время///////////////////////
 const updateTime = async (placeData) => {
   clearInterval(interval)
-  console.log(interval)
   const coordinates = placeData.coordinates
   const timeZone = await getTimeZone(...coordinates)
   interval = setInterval(getTime.bind(null, timeZone), 1000)
@@ -311,15 +304,16 @@ const startRecognizer = () => {
   searchPlace.classList.remove('incorrect')
     const recognition = new webkitSpeechRecognition()
     recognition.lang = `${language}`
-
     recognition.onresult = (event) => {
       const result = event.results[event.resultIndex]
       console.clear()
       searchPlace.value = result[0].transcript
-      findNewLocation(searchPlace.value)
+      findNewLocation()
     }
     recognition.start();
 }
+
+searchBtn.addEventListener('click', findNewLocation)
 
 microphone.addEventListener('click', startRecognizer);
 
