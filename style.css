@@ -1,6 +1,6 @@
 html{
     font-size: 20px;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-family: Cambria, Cochin, Georgia, serif;
 }
 
 *, :before, :after{
@@ -16,14 +16,13 @@ button{
 }
 .app--container{
     min-width: 320px;
-    max-width: 1440px;
+    max-width: 1380px;
     margin: 0 auto;
     background-repeat: no-repeat;
     background-size: cover;
     padding: 20px;
     display: flex;
     flex-wrap: wrap;
-    background-image: url('./img/background.jpg');
 }
 
 .control--block{
@@ -67,14 +66,15 @@ button{
     font-size: 0.8rem;
     width: 88px;
     height: 44px;
-    text-align: center;
     outline: none;
     cursor: pointer;
-    background-color: rgba(174,181,185,0.5);
+    background-color: rgb(174, 181, 185);
     text-transform: uppercase;
+    border-radius: 5px;
+    padding-left: 15px;
 }
 .active--temp {
-    background: red;
+    background: rgb(174, 181, 185);
 }
 .btn:hover{
     background-color: rgba(174, 181, 185, 0.801); 
@@ -91,18 +91,23 @@ button{
 .refresh--image--btn{
     background-image: url(./img/refresh.png);
     line-height: 54px;
+    border-radius: 5px;
 }
 
 .active--refresh{
     animation: spin 1s ease-in-out;
 }
 
-.lang--button--wrapper{
-    margin: 0 20px;
-    display: flex;
-}
 .temp--button--wrapper{
     display: flex;
+}
+.f--temperature{
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.c--temperature{
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .wrapper--search{
@@ -137,6 +142,9 @@ button{
     outline: none;
     background-color: rgba(76,82,85,0.4);
     cursor: pointer;
+}
+.voice--button:hover{
+    background:  rgba(174, 181, 185, 0.801)
 }
 
 .voice--img{
@@ -185,16 +193,16 @@ button{
     margin: 5px;
     background: rgba(0,0,0,.5);
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 3fr 2fr;
     grid-template-areas:  'temp img' 
                           'temp discr'  ;
+    align-items: center;
+    justify-items: center;
 }
 
 .weather--temp{
     grid-area: temp;
     font-size: 10rem;
-    text-align: center;
-    align-self: center;
 }
 .weather--temp--img{
     grid-area: img;
@@ -264,6 +272,9 @@ iframe{
     text-transform: capitalize;
     text-align: right;
     margin: 5px 0;
+}
+.incorrect{
+    box-shadow: inset -1px 0px 10px rgba(255, 0, 0, 0.5);
 }
 @media(max-width: 1181px){
     .wrapper--map{
