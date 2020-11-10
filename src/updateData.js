@@ -20,6 +20,8 @@ const windText = document.querySelector('.wind')
 const humidityText = document.querySelector('.humidity')
 const currentWeatherImg = document.querySelector('.weather--temp--img img')
 const descriptionWeatherText = document.querySelector('.description')
+const searchPlace = document.querySelector('.input--block')
+const searchBtn = document.querySelector('.search--btn')
 const milisecond = 1000
 let interval;
 
@@ -33,10 +35,13 @@ export const updateTime = async (placeData, language) => {
 export const updateAppData = async (placeData, language) => {
     let latitudeText = language === 'ru' ? 'Широта' : 'latitude'
     let longitudeText = language === 'ru' ? 'Долгота' : 'longitude'
+    let searchText = language === 'ru' ? 'Поиск' : 'Search'
     cityAndCountry.innerHTML = `${placeData.city?placeData.city:''} ${placeData.country}`
     let [latitudeValue, longitudeValue] = placeData.coordinates;
     latitude.innerHTML = `${latitudeText}: ${String(latitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
     longitude.innerHTML = `${longitudeText}: ${String(longitudeValue.toFixed(2)).replace(/[.]/g, '°')}'`;
+    searchBtn.textContent = searchText;
+    searchPlace.placeholder = searchText;
     return placeData.coordinates
 }
 

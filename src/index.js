@@ -40,8 +40,8 @@ const createMap = (coordinats, ymaps) => {
 
 const init = async (ymaps) => {
   const locationValue = await findGeolocation(momentCoordinates)
-  const placeData = await getData(locationValue, language, momentCoordinates, searchPlace)
-  const coordinates = await updateAppData(placeData, language)
+  const placeData = await getData(locationValue, language, momentCoordinates)
+  const coordinates = await updateAppData(placeData, language, searchBtn)
   myMap = createMap(locationValue, ymaps)
   myMap.controls.remove('smallMapDefaultSet')
   myMap.panTo(coordinates)
@@ -73,9 +73,9 @@ window.onload = () => {
 
 const findNewLocation = async () => {
   const locationValue = searchPlace.value;
-  const placeData = await getData(locationValue, language, momentCoordinates, searchPlace)
+  const placeData = await getData(locationValue, language, momentCoordinates)
   if (locationValue === '' || !placeData) return
-  const coordinates = await updateAppData(placeData, language)
+  const coordinates = await updateAppData(placeData, language, searchBtn)
   momentCoordinates = coordinates;
   myMap.panTo(coordinates, {
     duration: mapDuration
