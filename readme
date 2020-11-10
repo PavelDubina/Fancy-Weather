@@ -1,0 +1,1 @@
+https://paveldubina.github.io/Fancy-Weather/src/index.html
