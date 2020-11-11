@@ -94,7 +94,6 @@ const startRecognizer = () => { //Voice search
   recognition.lang = `${language}`
   recognition.onresult = (event) => {
     const result = event.results[event.resultIndex]
-    console.clear()
     searchPlace.value = result[0].transcript
     findNewLocation()
   }
