@@ -10,10 +10,6 @@ module.exports = {
                 test: /\.m?js$/,
                 exclude: /node_modules/,
                 loader: "babel-loader"
-            },
-            {
-                test: /\.(png|jpg|svg|gif)$/,
-                loader: 'file-loader'
             }
         ]
     }
