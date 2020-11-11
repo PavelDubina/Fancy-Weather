@@ -4,7 +4,7 @@ import {
     WEATHER_KEY
 } from './api.config'
 const datePlace = document.querySelector('.date--text')
-
+const searchPlace = document.querySelector('.input--block')
 export const findGeolocation = async (momentCoordinates) => {
     const result = await fetch(`https://ipinfo.io/json?token=${GEOLOCATION_KEY}`)
     const data = await result.json();
@@ -15,7 +15,7 @@ export const findGeolocation = async (momentCoordinates) => {
     return coordinates
 }
 
-export const getData = async (coords, language, momentCoordinates, searchPlace) => {
+export const getData = async (coords, language, momentCoordinates) => {
     try {
         const locationValue = coords ? coords : await findGeolocation(momentCoordinates)
         const yandexData = await window[`ymaps_${language}`].geocode(locationValue)
