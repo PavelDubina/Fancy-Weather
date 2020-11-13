@@ -171,6 +171,7 @@ button {
     border: none;
     outline: none;
     cursor: pointer;
+    text-transform: uppercase;
 }
 
 .search--btn:hover {
