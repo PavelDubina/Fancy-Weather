@@ -1,0 +1,29 @@
+{
+  "env": {
+		"browser": true,
+		"es6": true
+  },
+	"extends": "airbnb",
+  "parserOptions": {
+		"ecmaVersion": 2020,
+    "sourceType": "module"
+	},
+	"rules": {
+		"no-plusplus": 0,
+		"no-restricted-syntax": 0,
+		"no-param-reassign": 0,
+		"max-len": [
+      "error",
+      {
+        "code": 80,
+        "comments": 90,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true,
+        "ignoreRegExpLiterals": true,
+        "ignorePattern": "^\\s*(.+=\\s*(require|rewire)|test)\\s*\\("
+      }
+    ],
+		"import/no-cycle": 0
+	}
+}
