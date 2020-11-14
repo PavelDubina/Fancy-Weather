@@ -15,10 +15,13 @@ const getBackgroundImage = async () => {
   }
 };
 
-export const refreshBackgroundImage = () => {
-  getBackgroundImage().then((img) => {
-    background.style.backgroundImage = `url(${img})`;
-  });
+export const refreshBackgroundImage = async () => {
+  const imgUrl = await getBackgroundImage();
+  const image = document.createElement('img');
+  image.src = imgUrl;
+  image.onload = () => {
+    background.style.backgroundImage = `url(${imgUrl})`;
+  };
   refreshImg.classList.add('active--refresh');
 };
 
