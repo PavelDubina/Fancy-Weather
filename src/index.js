@@ -2,7 +2,7 @@ import {
   refreshImgBtn,
 } from './updateImg';
 import {
-  defaultOptions,
+  usedefaultOptions,
 } from './changeTempScale';
 import {
   getData,
@@ -46,15 +46,15 @@ const init = async (ymaps) => {
   updateTime(placeData, language);
   updateCurrentWeather(placeData, language);
   updateForecastWeather(placeData, language);
-  defaultOptions();
+  usedefaultOptions();
 };
 
 window.onload = () => {
-  const head = document.querySelectorAll('head')[0];
+  const head = document.querySelector('head');
   const select = document.querySelector('.language--select');
   select.value = localStorage.getItem('userLang') ? localStorage.getItem('userLang') : 'en';
-  select.createMap = function () {
-    language = this.value;
+  const loadMap = () => {
+    language = select.value;
     localStorage.setItem('userLang', language);
     if (myMap) myMap.destroy();
     const script = document.createElement('script');
@@ -65,8 +65,8 @@ window.onload = () => {
     };
     refreshImgBtn.click();
   };
-  select.addEventListener('change', select.createMap);
-  select.createMap();
+  select.addEventListener('change', loadMap);
+  loadMap();
 };
 
 const findNewLocation = async () => {
@@ -88,7 +88,8 @@ const findNewLocation = async () => {
 const startRecognizer = () => { // Voice search
   searchPlace.value = '';
   searchPlace.classList.remove('incorrect');
-  const recognition = new webkitSpeechRecognition();
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
   recognition.lang = `${language}`;
   recognition.onresult = (event) => {
     const result = event.results[event.resultIndex];

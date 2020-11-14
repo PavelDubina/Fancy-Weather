@@ -17,7 +17,7 @@ const updateScale = (foo) => {
   feelsLikeTemp.textContent = `${Math.round(foo(parseInt(feelsLikeTemp.textContent, 10)))}°`;
 };
 
-export const defaultOptions = () => {
+export const usedefaultOptions = () => {
   if (localStorage.getItem('userTempScale') === 'F') {
     forengeitBtn.classList.add('active--temp');
     forengeitBtnActive = false;
