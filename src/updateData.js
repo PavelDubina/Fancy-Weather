@@ -3,12 +3,12 @@ import { getForengeitScale } from './changeTempScale';
 
 export const currentWeatherTemp = document.querySelector('.weather--temp');
 export const feelsLikeTemp = document.querySelector('.feels--temp');
-export const forecastTempText = document.querySelectorAll('.future--temp');
+export const forecastTempText = document.querySelectorAll('.future--weather--temp');
 const latitude = document.querySelector('.latitude');
 const longitude = document.querySelector('.longitude');
-const cityAndCountry = document.querySelector('.location--text');
-const forecastWeatherImg = document.querySelectorAll('.future--img img');
-const forecastDayText = document.querySelectorAll('.future--day--name');
+const locationText = document.querySelector('.location--text');
+const forecastWeatherImg = document.querySelectorAll('.future--weather--img img');
+const forecastDayText = document.querySelectorAll('.future--weather--day--name');
 const feelsLikeText = document.querySelector('.feels--text');
 const windText = document.querySelector('.wind');
 const humidityText = document.querySelector('.humidity');
@@ -23,14 +23,14 @@ export const updateTime = async (placeData, language) => {
   clearInterval(interval);
   const { coordinates } = placeData;
   const timeZone = await getTimeZone(...coordinates);
-  interval = setInterval(getTime.bind(null, timeZone, language), 1000);
+  interval = setInterval(getTime.bind(null, timeZone, language), milisecond);
 };
 
 export const updateAppData = async (placeData, language) => {
   const latitudeText = language === 'ru' ? 'Широта' : 'latitude';
   const longitudeText = language === 'ru' ? 'Долгота' : 'longitude';
   const searchText = language === 'ru' ? 'Поиск' : 'Search';
-  cityAndCountry.innerHTML = `${placeData.city ? placeData.city : ''} ${
+  locationText.innerHTML = `${placeData.city ? placeData.city : ''} ${
     placeData.country
   }`;
   const [latitudeValue, longitudeValue] = placeData.coordinates;
@@ -45,27 +45,30 @@ export const updateAppData = async (placeData, language) => {
   return placeData.coordinates;
 };
 
-export const updateForecastWeather = async (placeData, language) => {
+const updateForecastDate = (weather, language) => {
   let dayNameIndex = 0;
-  let dayTempIndex = 0;
-  let dayIconIndex = 0;
-  const { coordinates } = placeData;
-  const weatherData = await getWeather(language, coordinates);
-  const weather = weatherData.forecast;
   const arrayDayDate = [
     weather.firstDayData.dt * milisecond,
     weather.secondDayData.dt * milisecond,
     weather.thirdDayData.dt * milisecond,
   ];
+  forecastDayText.forEach((dayText) => {
+    dayText.innerHTML = new Date(arrayDayDate[dayNameIndex]).toLocaleString(
+      `${language}`,
+      {
+        weekday: 'long',
+      },
+    );
+    dayNameIndex++;
+  });
+};
+
+const updateForecastTemp = (weather) => {
+  let dayTempIndex = 0;
   const arrayDayTemp = [
     weather.firstDayData.temp.day.toFixed(),
     weather.secondDayData.temp.day.toFixed(),
     weather.thirdDayData.temp.day.toFixed(),
-  ];
-  const arrayDayIcon = [
-    weather.firstDayData.weather[0].icon,
-    weather.secondDayData.weather[0].icon,
-    weather.thirdDayData.weather[0].icon,
   ];
   forecastTempText.forEach((tempText) => {
     if (localStorage.getItem('userTempScale') === 'F') {
@@ -76,19 +79,28 @@ export const updateForecastWeather = async (placeData, language) => {
     tempText.innerHTML = `${arrayDayTemp[dayTempIndex]}°`;
     dayTempIndex++;
   });
-  forecastDayText.forEach((dayText) => {
-    dayText.innerHTML = new Date(arrayDayDate[dayNameIndex]).toLocaleString(
-      `${language}`,
-      {
-        weekday: 'long',
-      },
-    );
-    dayNameIndex++;
-  });
+};
+
+const updateForecastIcons = (weather) => {
+  let dayIconIndex = 0;
+  const arrayDayIcon = [
+    weather.firstDayData.weather[0].icon,
+    weather.secondDayData.weather[0].icon,
+    weather.thirdDayData.weather[0].icon,
+  ];
   forecastWeatherImg.forEach((dayIcon) => {
     dayIcon.src = `http://openweathermap.org/img/wn/${arrayDayIcon[dayIconIndex]}@4x.png`;
     dayIconIndex++;
   });
+};
+
+export const updateForecastWeather = async (placeData, language) => {
+  const { coordinates } = placeData;
+  const weatherData = await getWeather(language, coordinates);
+  const weather = weatherData.forecast;
+  updateForecastIcons(weather);
+  updateForecastTemp(weather);
+  updateForecastDate(weather, language);
 };
 
 export const updateCurrentWeather = async (placeData, language) => {

@@ -9,9 +9,8 @@ const searchPlace = document.querySelector('.input--block');
 export const findGeolocation = async (momentCoordinates) => {
   const result = await fetch(`https://ipinfo.io/json?token=${GEOLOCATION_KEY}`);
   const data = await result.json();
-  let coordinates = data.loc.split(',').map((i) => +i);
-  coordinates = momentCoordinates || coordinates;
-  return coordinates;
+  const coordinates = data.loc.split(',').map((i) => +i);
+  return momentCoordinates || coordinates;
 };
 
 export const getData = async (coords, language, momentCoordinates) => {
@@ -39,8 +38,7 @@ export const getData = async (coords, language, momentCoordinates) => {
 export const getTimeZone = async (latitude, longitude) => {
   const result = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${TIMEZONE_KEY}&pretty=1`);
   const data = await result.json();
-  const timeZone = data.results[0].annotations.timezone.name;
-  return timeZone;
+  return data.results[0].annotations.timezone.name;
 };
 
 export const getTime = (timeZone, language) => {

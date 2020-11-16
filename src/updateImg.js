@@ -4,6 +4,7 @@ import {
 
 const background = document.querySelector('.app--container');
 const refreshImg = document.querySelector('.refresh--img');
+const testImage = document.createElement('img');
 export const refreshImgBtn = document.querySelector('.refresh--image--btn');
 const getBackgroundImage = async () => {
   try {
@@ -17,9 +18,8 @@ const getBackgroundImage = async () => {
 
 export const refreshBackgroundImage = async () => {
   const imgUrl = await getBackgroundImage();
-  const image = document.createElement('img');
-  image.src = imgUrl;
-  image.onload = () => {
+  testImage.src = imgUrl;
+  testImage.onload = () => {
     background.style.backgroundImage = `url(${imgUrl})`;
   };
   refreshImg.classList.add('active--refresh');

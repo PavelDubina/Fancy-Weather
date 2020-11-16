@@ -36,16 +36,23 @@ const createMap = (coordinats, ymaps) => new ymaps.Map(container, {
   type: 'yandex#hybrid',
 });
 
-const init = async (ymaps) => {
-  const locationValue = await findGeolocation(momentCoordinates);
-  const placeData = await getData(locationValue, language, momentCoordinates);
+const updateAll = async (placeData) => {
   const coordinates = await updateAppData(placeData, language, searchBtn);
-  myMap = createMap(locationValue, ymaps);
-  myMap.controls.remove('smallMapDefaultSet');
-  myMap.panTo(coordinates);
+  momentCoordinates = coordinates;
+  myMap.panTo(coordinates, {
+    duration: mapDuration,
+  });
   updateTime(placeData, language);
   updateCurrentWeather(placeData, language);
   updateForecastWeather(placeData, language);
+};
+
+const init = async (ymaps) => {
+  const locationValue = await findGeolocation(momentCoordinates);
+  const placeData = await getData(locationValue, language, momentCoordinates);
+  myMap = createMap(locationValue, ymaps);
+  myMap.controls.remove('smallMapDefaultSet');
+  updateAll(placeData);
   usedefaultOptions();
 };
 
@@ -73,14 +80,7 @@ const findNewLocation = async () => {
   const locationValue = searchPlace.value;
   const placeData = await getData(locationValue, language, momentCoordinates);
   if (locationValue === '' || !placeData) return;
-  const coordinates = await updateAppData(placeData, language, searchBtn);
-  momentCoordinates = coordinates;
-  myMap.panTo(coordinates, {
-    duration: mapDuration,
-  });
-  updateTime(placeData, language);
-  updateCurrentWeather(placeData, language);
-  updateForecastWeather(placeData, language);
+  updateAll(placeData);
   refreshImgBtn.click();
   searchPlace.value = '';
 };
