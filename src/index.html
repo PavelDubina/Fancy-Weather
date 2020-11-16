@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="./assets/images/weather.png" />
+    <title>Fancy-Weather</title>
+</head>
+
+<body>
+    <div class="app--container">
+        <div class="control--block">
+            <div class="wrapper wrapper--btns">
+                <button class="btn refresh--image--btn">
+                    <img src="./assets/images/vector.png" alt="refresh" class="refresh--img" />
+                </button>
+                <select class="language--select">
+                    <option value="ru">ru</option>
+                    <option value="en">en</option>
+                </select>
+                <div class="temp--button--wrapper">
+                    <button class="btn f--temperature">°F</button>
+                    <button class="btn c--temperature">°C</button>
+                </div>
+            </div>
+            <div class="wrapper wrapper--search">
+                <input type="text" class="input--block" />
+                <button class="voice--button">
+                    <img src="./assets/images/voice.png" alt="refresh" class="voice--img" />
+                </button>
+                <button class="search--btn"></button>
+            </div>
+        </div>
+        <div class="wrapper--weather">
+            <div class="location--text"></div>
+            <div class="date--text"></div>
+            <div class="weather--block">
+                <div class="weather--temp"></div>
+                <div class="weather--temp--img">
+                    <img src="" alt="weather" />
+                </div>
+                <div class="weather--discription">
+                    <p class="description"></p>
+                    <p class="feels">
+                        <span class="feels--text"></span><span class="feels--temp"></span>
+                    </p>
+                    <p class="wind"></p>
+                    <p class="humidity"></p>
+                </div>
+            </div>
+            <div class="future--weather--block">
+                <div class="future--weather--day">
+                    <div class="future--weather--day--name"></div>
+                    <div class="future--weather--temp"></div>
+                    <div class="future--weather--img">
+                        <img src="" alt="future-weather" />
+                    </div>
+                </div>
+                <div class="future--weather--day">
+                    <div class="future--weather--day--name"></div>
+                    <div class="future--weather--temp"></div>
+                    <div class="future--weather--img">
+                        <img src="" alt="future-weather" />
+                    </div>
+                </div>
+                <div class="future--weather--day">
+                    <div class="future--weather--day--name"></div>
+                    <div class="future--weather--temp"></div>
+                    <div class="future--weather--img">
+                        <img src="" alt="future-weather" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="wrapper--map">
+            <div class="map" id="map"></div>
+            <p class="coordinates latitude"></p>
+            <p class="coordinates longitude"></p>
+        </div>
+    </div>
+    <script src="../dist/main.js"></script>
+</body>
+
+</html>
