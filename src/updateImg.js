@@ -16,12 +16,15 @@ const getBackgroundImage = async () => {
   }
 };
 
+const changeBackground = (imgUrl) => {
+  background.style.backgroundImage = `url(${imgUrl})`;
+};
+
 export const refreshBackgroundImage = async () => {
   const imgUrl = await getBackgroundImage();
   testImage.src = imgUrl;
-  testImage.onload = () => {
-    background.style.backgroundImage = `url(${imgUrl})`;
-  };
+  testImage.removeEventListener('load', changeBackground.bind(null, imgUrl));
+  testImage.addEventListener('load', changeBackground.bind(null, imgUrl));
   refreshImg.classList.add('active--refresh');
 };
 
